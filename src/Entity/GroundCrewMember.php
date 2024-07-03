@@ -2,24 +2,31 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
 use App\Repository\GroundCrewMemberRepository;
+use App\State\GroundCrewMemberStateProcessor;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: GroundCrewMemberRepository::class)]
-class GroundCrewMember
+#[ApiResource(
+    operations: [
+        new Get(uriTemplate: '/ground-crew-members/{uuid}'),
+        new Post(
+            uriTemplate: '/ground-crew-members',
+            processor: GroundCrewMemberStateProcessor::class,
+        )
+    ],
+    normalizationContext: ['groups' => ['entity:read', 'gcm:read']],
+    denormalizationContext: ['groups' => ['gcm:write']],
+)]
+class GroundCrewMember extends BaseEntity
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
     #[ORM\Column(length: 255)]
+    #[Groups(['gcm:read', 'gcm:write'])]
     private ?string $name = null;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     public function getName(): ?string
     {

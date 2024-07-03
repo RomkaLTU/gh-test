@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new Get(uriTemplate: '/skills/{uuid}'),
         new Post(processor: SkillStateProcessor::class),
     ],
-    normalizationContext: ['groups' => ['skill:read']],
+    normalizationContext: ['groups' => ['entity:read', 'skill:read']],
     denormalizationContext: ['groups' => ['skill:write']],
 )]
 class Skill extends BaseEntity

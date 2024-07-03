@@ -18,7 +18,7 @@ abstract class BaseEntity
 
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ApiProperty(identifier: true)]
-    #[Groups(['flight:read', 'skill:read'])]
+    #[Groups(['entity:read'])]
     protected Uuid $uuid;
 
     public function __construct()

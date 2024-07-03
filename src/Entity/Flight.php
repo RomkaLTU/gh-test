@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new Get(uriTemplate: '/flights/{uuid}'),
         new Post(processor: FlightStateProcessor::class)
     ],
-    normalizationContext: ['groups' => ['flight:read']],
+    normalizationContext: ['groups' => ['entity:read', 'flight:read']],
     denormalizationContext: ['groups' => ['flight:write']],
 )]
 class Flight extends BaseEntity
