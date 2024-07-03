@@ -4,6 +4,7 @@ namespace App\Tests;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Symfony\Bundle\Test\Client;
+use App\Enum\FlightTypeEnum;
 use Symfony\Component\HttpFoundation\Response;
 
 class FlightApiTest extends ApiTestCase
@@ -19,6 +20,7 @@ class FlightApiTest extends ApiTestCase
     {
         $flightData = [
             'nr' => 'FL123',
+            'type' => FlightTypeEnum::ARRIVAL,
         ];
 
         $response = $this->client->request('POST', '/api/flights', [
