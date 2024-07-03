@@ -2,28 +2,41 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
 use App\Repository\CertificationRepository;
+use App\State\CertificateStateProcessor;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CertificationRepository::class)]
-class Certification
+#[ApiResource(
+    operations: [
+        new Get(uriTemplate: '/certificates/{uuid}'),
+        new Post(processor: CertificateStateProcessor::class),
+    ],
+    normalizationContext: ['groups' => ['entity:read', 'cert:read']],
+    denormalizationContext: ['groups' => ['cert:write']],
+)]
+class Certification extends BaseEntity
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
     #[ORM\Column(length: 255)]
+    #[ApiProperty(openapiContext: [
+        'example' => 'Medical Certificate'
+    ])]
+    #[Groups(['cert:read', 'cert:write'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE)]
-    private ?\DateTimeImmutable $validity_date = null;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+    #[ApiProperty(openapiContext: [
+        'example' => '2024-12-31T23:59:59+00:00'
+    ])]
+    #[Groups(['cert:read', 'cert:write'])]
+    private ?DateTimeImmutable $validity_date = null;
 
     public function getName(): ?string
     {
@@ -37,12 +50,12 @@ class Certification
         return $this;
     }
 
-    public function getValidityDate(): ?\DateTimeImmutable
+    public function getValidityDate(): ?DateTimeImmutable
     {
         return $this->validity_date;
     }
 
-    public function setValidityDate(\DateTimeImmutable $validity_date): static
+    public function setValidityDate(DateTimeImmutable $validity_date): static
     {
         $this->validity_date = $validity_date;
 
