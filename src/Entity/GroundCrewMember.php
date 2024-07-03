@@ -44,11 +44,22 @@ class GroundCrewMember extends BaseEntity
     #[Groups(['gcm:read', 'gcm:write'])]
     private Collection $skills;
 
+    #[ORM\ManyToMany(targetEntity: Certification::class, inversedBy: 'groundCrewMembers')]
+    #[ORM\JoinTable(name: 'ground_crew_member_certificates')]
+    #[ApiProperty(openapiContext: [
+        'example' => [
+            '/api/certificates/b1eaa418-ebfc-4ce5-ba83-fc263ec997dd',
+        ]
+    ])]
+    #[Groups(['gcm:read', 'gcm:write'])]
+    private Collection $certifications;
+
     public function __construct()
     {
         parent::__construct();
 
         $this->skills = new ArrayCollection();
+        $this->certifications = new ArrayCollection();
     }
 
     public function getName(): ?string
@@ -80,10 +91,46 @@ class GroundCrewMember extends BaseEntity
         return $this;
     }
 
-    public function removeSkill(Skill $skill): static
+    /**
+     * @return Collection<int, Certification>
+     */
+    public function getCertifications(): Collection
     {
-        $this->skills->removeElement($skill);
+        return $this->certifications;
+    }
+
+    public function addCertification(Certification $certification): static
+    {
+        if (!$this->certifications->contains($certification)) {
+            $this->certifications->add($certification);
+        }
 
         return $this;
+    }
+
+    /**
+     * @param string[] $skillIris
+     */
+    #[Groups(['gcm:write'])]
+    public function setSkills(array $skillIris): void
+    {
+        $this->skills = new ArrayCollection();
+
+        foreach ($skillIris as $iri) {
+            $this->skills->add($iri);
+        }
+    }
+
+    /**
+     * @param string[] $certificationIris
+     */
+    #[Groups(['gcm:write'])]
+    public function setCertifications(array $certificationIris): void
+    {
+        $this->certifications = new ArrayCollection();
+
+        foreach ($certificationIris as $iri) {
+            $this->certifications->add($iri);
+        }
     }
 }
