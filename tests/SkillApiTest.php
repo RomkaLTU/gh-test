@@ -4,10 +4,9 @@ namespace App\Tests;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Symfony\Bundle\Test\Client;
-use App\Enum\FlightTypeEnum;
 use Symfony\Component\HttpFoundation\Response;
 
-class FlightApiTest extends ApiTestCase
+class SkillApiTest extends ApiTestCase
 {
     private Client $client;
 
@@ -16,50 +15,49 @@ class FlightApiTest extends ApiTestCase
         $this->client = static::createClient();
     }
 
-    public function testCreateFlight(): array
+    public function testCreateSkill(): array
     {
         $data = [
-            'nr' => 'FL123',
-            'type' => FlightTypeEnum::ARRIVAL,
+            'name' => 'refueling',
         ];
 
-        $response = $this->client->request('POST', '/api/flights', [
+        $response = $this->client->request('POST', '/api/skills', [
             'headers' => ['Content-Type' => 'application/ld+json'],
             'json' => $data,
         ]);
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
         $this->assertJsonContains([
-            'nr' => 'FL123',
+            'name' => 'refueling',
         ]);
 
         return $response->toArray();
     }
 
     /**
-     * @depends testCreateFlight
+     * @depends testCreateSkill
      */
-    public function testGetExistingFlight(array $data): void
+    public function testGetExistingSkill(array $data)
     {
         $uuid = $data['uuid'];
 
-        $this->client->request('GET', '/api/flights/' . $uuid);
+        $this->client->request('GET', '/api/skills/' . $uuid);
 
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
 
         $this->assertJsonContains([
-            '@context' => '/api/contexts/Flight',
-            '@id' => '/api/flights/' . $uuid,
-            '@type' => 'Flight',
+            '@context' => '/api/contexts/Skill',
+            '@id' => '/api/skills/' . $uuid,
+            '@type' => 'Skill',
             'uuid' => $uuid,
-            'nr' => 'FL123',
+            'name' => 'refueling',
         ]);
     }
 
-    public function testGetNonExistentFlight(): void
+    public function testGetNonExistentSkill()
     {
         $nonExistentUuid = 'c022460d-2fcd-4ed1-a246-0d2fcdced147';
-        $this->client->request('GET', '/api/flights/' . $nonExistentUuid);
+        $this->client->request('GET', '/api/skills/' . $nonExistentUuid);
 
         $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
     }
