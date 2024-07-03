@@ -13,10 +13,7 @@ readonly class FlightStateProcessor implements ProcessorInterface
     public function __construct(private EntityManagerInterface $entityManager)
     {}
 
-    /**
-     * @return Flight|void
-     */
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Flight
     {
         if (!$data instanceof Flight) {
             throw new InvalidArgumentException('Data is not an instance of Flight');
