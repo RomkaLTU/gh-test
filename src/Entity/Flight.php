@@ -49,7 +49,7 @@ class Flight
         $this->uuid = Uuid::v4();
     }
 
-    public function getId(): string
+    public function getId(): ?int
     {
         return $this->id;
     }
