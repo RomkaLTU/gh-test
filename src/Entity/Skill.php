@@ -40,11 +40,16 @@ class Skill extends BaseEntity
     #[Groups(['skill:read', 'skill:write'])]
     private Collection $groundCrewMembers;
 
+    #[ORM\ManyToMany(targetEntity: Task::class, mappedBy: 'requiredSkills')]
+    #[Groups(['skill:read', 'skill:write'])]
+    private Collection $tasks;
+
     public function __construct()
     {
         parent::__construct();
 
         $this->groundCrewMembers = new ArrayCollection();
+        $this->tasks = new ArrayCollection();
     }
 
     /**
@@ -53,6 +58,14 @@ class Skill extends BaseEntity
     public function getGroundCrewMembers(): Collection
     {
         return $this->groundCrewMembers;
+    }
+
+    /**
+     * @return Collection<int, Task>
+     */
+    public function getTasks(): Collection
+    {
+        return $this->tasks;
     }
 
     public function addGroundCrewMember(GroundCrewMember $groundCrewMember): static
