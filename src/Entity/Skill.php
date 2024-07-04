@@ -5,6 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use App\Repository\SkillRepository;
 use App\State\SkillStateProcessor;
@@ -16,6 +17,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: SkillRepository::class)]
 #[ApiResource(
     operations: [
+        new GetCollection(uriTemplate: '/skills', normalizationContext: ['groups' => ['skill:list']]),
         new Get(uriTemplate: '/skills/{uuid}'),
         new Post(processor: SkillStateProcessor::class),
     ],
@@ -28,7 +30,7 @@ class Skill extends BaseEntity
     #[ApiProperty(openapiContext: [
         'example' => 'Piloting'
     ])]
-    #[Groups(['skill:read', 'skill:write', 'gcm:read'])]
+    #[Groups(['skill:list', 'skill:read', 'skill:write', 'gcm:read'])]
     private ?string $name = null;
 
     #[ORM\ManyToMany(targetEntity: GroundCrewMember::class, mappedBy: 'skills')]
@@ -37,11 +39,11 @@ class Skill extends BaseEntity
             '/api/ground-crew-members/0bae7248-76a3-4603-94a8-b1c2d410b8a2',
         ]
     ])]
-    #[Groups(['skill:read', 'skill:write'])]
+    #[Groups(['skill:read'])]
     private Collection $groundCrewMembers;
 
     #[ORM\ManyToMany(targetEntity: Task::class, mappedBy: 'requiredSkills')]
-    #[Groups(['skill:read', 'skill:write'])]
+    #[Groups(['skill:read'])]
     private Collection $tasks;
 
     public function __construct()
