@@ -16,28 +16,17 @@ class GroundCrewMemberRepository extends ServiceEntityRepository
         parent::__construct($registry, GroundCrewMember::class);
     }
 
-    //    /**
-    //     * @return GroundCrewMember[] Returns an array of GroundCrewMember objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('g')
-    //            ->andWhere('g.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('g.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?GroundCrewMember
-    //    {
-    //        return $this->createQueryBuilder('g')
-    //            ->andWhere('g.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function findOneAvailableMemberWithSkill(string $skillId): ?GroundCrewMember
+    {
+        return $this->createQueryBuilder('gcm')
+            ->leftJoin('gcm.skills', 's')
+            ->leftJoin('gcm.tasks', 't')
+            ->where('s.id = :skillId')
+            ->groupBy('gcm.id')
+            ->orderBy('COUNT(t.id)', 'ASC')
+            ->setParameter('skillId', $skillId)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }
