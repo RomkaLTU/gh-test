@@ -54,12 +54,17 @@ class GroundCrewMember extends BaseEntity
     #[Groups(['gcm:read', 'gcm:write'])]
     private Collection $certifications;
 
+    #[ORM\OneToMany(targetEntity: Task::class, mappedBy: 'assignedTo')]
+    #[Groups(['gcm:read'])]
+    private Collection $tasks;
+
     public function __construct()
     {
         parent::__construct();
 
         $this->skills = new ArrayCollection();
         $this->certifications = new ArrayCollection();
+        $this->tasks = new ArrayCollection();
     }
 
     public function getName(): ?string
@@ -132,5 +137,23 @@ class GroundCrewMember extends BaseEntity
         foreach ($certificationIris as $iri) {
             $this->certifications->add($iri);
         }
+    }
+
+    /**
+     * @return Collection<int, Task>
+     */
+    public function getTasks(): Collection
+    {
+        return $this->tasks;
+    }
+
+    public function addTask(Task $task): static
+    {
+        if (!$this->tasks->contains($task)) {
+            $this->tasks->add($task);
+            $task->setAssignedTo($this);
+        }
+
+        return $this;
     }
 }

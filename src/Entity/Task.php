@@ -46,6 +46,16 @@ class Task extends BaseEntity
     #[Groups(['task:read', 'task:write'])]
     private Collection $requiredSkills;
 
+    #[ORM\ManyToMany(targetEntity: Certification::class, inversedBy: 'tasks')]
+    #[ORM\JoinTable(name: 'task_required_certifications')]
+    #[ApiProperty(openapiContext: [
+        'example' => [
+            '/api/certificates/b1eaa418-ebfc-4ce5-ba83-fc263ec997dd',
+        ]
+    ])]
+    #[Groups(['task:read', 'task:write'])]
+    private Collection $requiredCertifications;
+
     #[ORM\ManyToOne(targetEntity: Flight::class, inversedBy: 'tasks')]
     #[ORM\JoinColumn(nullable: false)]
     #[ApiProperty(openapiContext: [
@@ -54,11 +64,20 @@ class Task extends BaseEntity
     #[Groups(['task:read', 'task:write'])]
     private ?Flight $flight = null;
 
+    #[ORM\ManyToOne(targetEntity: GroundCrewMember::class, inversedBy: 'tasks')]
+    #[ORM\JoinColumn(nullable: true)]
+    #[ApiProperty(openapiContext: [
+        'example' => '/api/ground-crew-members/8da044b2-1cd0-4ad0-87f2-832fbefa914c',
+    ])]
+    #[Groups(['task:read', 'task:write'])]
+    private ?GroundCrewMember $assignedTo = null;
+
     public function __construct()
     {
         parent::__construct();
 
         $this->requiredSkills = new ArrayCollection();
+        $this->requiredCertifications = new ArrayCollection();
         $this->status = TaskStatusEnum::PENDING;
     }
 
@@ -104,6 +123,30 @@ class Task extends BaseEntity
         }
     }
 
+    public function getRequiredCertifications(): Collection
+    {
+        return $this->requiredCertifications;
+    }
+
+    public function addRequiredCertification(Certification $certification): static
+    {
+        if (!$this->requiredCertifications->contains($certification)) {
+            $this->requiredCertifications->add($certification);
+        }
+
+        return $this;
+    }
+
+    #[Groups(['task:write'])]
+    public function setRequiredCertifications(array $certificationIris): void
+    {
+        $this->requiredCertifications = new ArrayCollection();
+
+        foreach ($certificationIris as $iri) {
+            $this->requiredCertifications->add($iri);
+        }
+    }
+
     public function getFlight(): ?Flight
     {
         return $this->flight;
@@ -124,6 +167,18 @@ class Task extends BaseEntity
     public function setStatus(TaskStatusEnum $status): static
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getAssignedTo(): ?GroundCrewMember
+    {
+        return $this->assignedTo;
+    }
+
+    public function setAssignedTo(?GroundCrewMember $groundCrewMember): static
+    {
+        $this->assignedTo = $groundCrewMember;
 
         return $this;
     }
